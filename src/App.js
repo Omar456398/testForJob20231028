@@ -11,9 +11,13 @@ function App() {
   const dragOverItem = useRef();
   useEffect(() => {
     (async () => {
-      const resp = await fetch("http://localhost:3001/tasks");
-      const respJSON = await resp.json();
-      setTasks(respJSON.sort((a, b) => a.order - b.order));
+      try {
+        const resp = await fetch("http://localhost:3001/tasks");
+        const respJSON = await resp.json();
+        setTasks(respJSON.sort((a, b) => a.order - b.order));
+      } catch(err) {
+        alert('error connecting to server, please reload page')
+      }
     })();
   }, [reloadToggle]);
 
