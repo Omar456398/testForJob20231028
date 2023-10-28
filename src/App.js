@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import TaskDisplay from "./components/TaskDisplay";
 import { v4 as uuidv4 } from "uuid";
@@ -7,6 +7,8 @@ function App() {
   const [tasks, setTasks] = useState([]);
   const [reloadToggle, setReloadToggle] = useState(false);
   const [newTask, setNewTask] = useState("");
+  const dragItem = useRef();
+  const dragOverItem = useRef();
   useEffect(() => {
     (async () => {
       const resp = await fetch("http://localhost:3001/tasks");
@@ -29,15 +31,56 @@ function App() {
       isCompleted: false,
       id: uuidv4(),
     };
-    console.log(dataToAdd);
     fetch("http://localhost:3001/tasks", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(dataToAdd),
-    }).then((item) => {
+    }).then(() => {
       setNewTask("");
       reload();
     });
+  };
+  const dragStart = (e, position) => {
+    dragItem.current = position;
+  };
+  const dragOver = (e, position) => {
+    dragOverItem.current = position;
+  };
+  const dragAway = (e, position) => {
+    dragOverItem.current = undefined;
+  };
+  const drop = (e) => {
+    if (dragOverItem.current) {
+      const currentDragItem = dragItem.current;
+      const currentDragOverItem = dragOverItem.current;
+      const currentDragItemOrder = tasks.find(
+        (item) => (item.id === currentDragItem)
+      ).order;
+      const currentDragOverItemOrder = tasks.find(
+        (item) => (item.id === currentDragOverItem)
+      ).order;
+
+      if (currentDragItemOrder !== currentDragOverItemOrder) {
+        let newDragItemOrder = currentDragOverItemOrder;
+        let increment = 1
+        if(currentDragItemOrder > currentDragOverItemOrder) {
+          increment = -1
+        }
+        while((newDragItemOrder + increment) <= 0 || tasks.find(item => item.order === newDragItemOrder + increment)) {
+          increment /= 10
+        }
+        newDragItemOrder += increment
+        fetch(`http://localhost:3001/tasks/${currentDragItem}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ order: newDragItemOrder }),
+        }).then(() => {
+          reload();
+        });
+      }
+    }
+    dragOverItem.current = undefined;
+    dragItem.current = undefined;
   };
   return (
     <div className="App">
@@ -54,7 +97,12 @@ function App() {
             />
           </div>
           <div>
-            <input type="submit" className="add_task" onClick={addTask} value={'add new task'} />
+            <input
+              type="submit"
+              className="add_task"
+              onClick={addTask}
+              value={"add new task"}
+            />
           </div>
         </div>
       </form>
@@ -66,6 +114,11 @@ function App() {
             name={item.name}
             isCompleted={item.isCompleted}
             reload={reload}
+            dragStart={dragStart}
+            dragOver={dragOver}
+            dragAway={dragAway}
+            refDraggedOver={dragOverItem}
+            drop={drop}
           />
         );
       })}

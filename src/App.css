@@ -17,14 +17,40 @@
   cursor: pointer;
   user-select: none;
 }
+.dragger{
+  margin-right: 20px;
+  font-size: 16px;
+  cursor: move;
+  user-select: none;
+}
+.dragged-over {
+  border-color: aquamarine;
+}
 .add_task_container{
   display: flex;
   margin: 20px 40px;
 }
-.add_task_input{
+.add_task_input,
+.edit_task_input{
   width: calc(100% - 20px);
   height: 90%;
 }
+.task-name {
+  position: relative;
+}
+.task-name:hover::after {
+  color: black;
+  position: absolute;
+  left: 0px;
+  bottom: 100%;
+  font-size: 8px;
+  background-color: #bbb;
+  padding: 10px;
+  opacity: 0.5;
+  border-radius: 6px;
+  content: 'double click, input text, and then press enter to edit';
+}
+
 .add_task {
   padding: 10px;
   background-color: lightblue;
