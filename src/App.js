@@ -42,7 +42,7 @@ function App() {
     }).then(() => {
       setNewTask("");
       reload();
-    });
+    }).catch(()=> alert('failed to add task'));
   };
   const dragStart = (e, position) => {
     dragItem.current = position;
@@ -80,7 +80,7 @@ function App() {
           body: JSON.stringify({ order: newDragItemOrder }),
         }).then(() => {
           reload();
-        });
+        }).catch(()=>alert('failed to reorder'));
       }
     }
     dragOverItem.current = undefined;

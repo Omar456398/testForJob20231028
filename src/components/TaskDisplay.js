@@ -53,7 +53,7 @@ function TaskDisplay({
                   body: JSON.stringify({ name: nameEdited.trim() }),
                 }).then((item) => {
                   reload();
-                });
+                }).catch(()=>alert('failed to update'));
               }
             }}
           />
@@ -78,7 +78,7 @@ function TaskDisplay({
             body: JSON.stringify({ isCompleted: !isCompleted }),
           }).then((item) => {
             reload();
-          });
+          }).catch(()=>alert('failed to update'));
         }}
       >
         {isCompleted ? "✅" : "▶️"}
@@ -92,7 +92,7 @@ function TaskDisplay({
             headers: { "Content-Type": "application/json" },
           }).then((item) => {
             reload();
-          });
+          }).catch(()=>alert('failed to delete'));
         }}
       >
         ❌
