@@ -39,7 +39,7 @@ function Register() {
     <form>
       <table className="register-table">
         <tr>
-          <td colSpan={2} style={{ textAlign: "center" }}>
+          <td colSpan={3} style={{ textAlign: "center" }}>
             <h2>Register New User</h2>
           </td>
         </tr>
@@ -47,7 +47,7 @@ function Register() {
           <td className="register-label">
             <label for="email">Email&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
           </td>
-          <td>
+          <td colSpan={2}>
             <input
               type="email"
               className="register-input"
@@ -64,7 +64,7 @@ function Register() {
               Password&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             </label>
           </td>
-          <td>
+          <td colSpan={2}>
             <input
               className="register-input"
               type="password"
@@ -77,8 +77,8 @@ function Register() {
         </tr>
         <tr></tr>
         <tr>
-          {" "}
-          <td colSpan={2} style={{ textAlign: "center" }}>
+          <td></td>
+          <td style={{ textAlign: "center" }}>
             <input
               className="create_user"
               type="submit"
@@ -93,6 +93,16 @@ function Register() {
                 });
               }}
             />
+          </td>
+          <td style={{ textAlign: "center" }}>
+            <button
+              className="create_user"
+              onClick={(e) => {
+                history.replace("/");
+              }}
+            >
+              Login as Existing User
+            </button>
           </td>
         </tr>
       </table>
