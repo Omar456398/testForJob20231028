@@ -9,6 +9,7 @@ function TaskDisplay({
   dragOver,
   refDraggedOver,
   drop,
+  accessToken
 }) {
   const [isDragHover, setIsDragHover] = useState(false);
   const [nameEdited, setNameEdited] = useState(name);
@@ -49,7 +50,7 @@ function TaskDisplay({
                 setIsNameBeingEdited(false);
                 fetch(`http://localhost:3001/tasks/${id}`, {
                   method: "PATCH",
-                  headers: { "Content-Type": "application/json" },
+                  headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
                   body: JSON.stringify({ name: nameEdited.trim() }),
                 }).then((item) => {
                   reload();
@@ -74,7 +75,7 @@ function TaskDisplay({
         onClick={() => {
           fetch(`http://localhost:3001/tasks/${id}`, {
             method: "PATCH",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
             body: JSON.stringify({ isCompleted: !isCompleted }),
           }).then((item) => {
             reload();
@@ -89,7 +90,7 @@ function TaskDisplay({
         onClick={() => {
           fetch(`http://localhost:3001/tasks/${id}`, {
             method: "DELETE",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
           }).then((item) => {
             reload();
           }).catch(()=>alert('failed to delete'));
