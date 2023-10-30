@@ -225,10 +225,9 @@ function AppMain() {
     </form>
   ) : (
     <div className="main_app">
-    <div className="logged_in_placeholder"></div>
+      <div className="logged_in_placeholder"></div>
       <div className="logged_in">
-        {" "}
-        logged in as: {userData.email}{" "}
+        <div className="logged_in_as">logged in as: {userData.email}</div>
         <button
           onClick={() => {
             localStorage.removeItem("accessToken");
@@ -237,7 +236,7 @@ function AppMain() {
           className="log_out"
         >
           Log out
-        </button>{" "}
+        </button>
       </div>
       <form>
         <div className="add_task_container">

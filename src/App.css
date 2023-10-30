@@ -87,12 +87,16 @@
   width: calc(100% - 80px);
   left: 0px;
   top: 0px;
+  display: flex;
 }
 .logged_in_placeholder {
   height: 60px;
 }
 .main_app {
   min-width: 767px;
+}
+.logged_in_as {
+  flex-grow: 1;
 }
 .log_out {
   margin-top: -10px;
@@ -102,7 +106,6 @@
   border-width: 2px 2px 1px 1px;
   border-color: #ddd #ddd #bbb #bbb;
   cursor: pointer;
-  float: right;
 }
 
 @media screen and (max-width: 766px) {
