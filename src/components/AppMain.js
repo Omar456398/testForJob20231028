@@ -10,7 +10,7 @@ function AppMain() {
   const [accessToken, setAccessToken] = useState("");
   const [reloadToggle, setReloadToggle] = useState(false);
   const [newTask, setNewTask] = useState("");
-  const [isShowLogin, setIsShowLogin] = useState(false);
+  const [isShowLogin, setIsShowLogin] = useState(true);
   const [loginData, setLoginData] = useState({});
   const dragItem = useRef();
   const dragOverItem = useRef();
@@ -152,6 +152,10 @@ function AppMain() {
       body: JSON.stringify(loginData),
     });
     const loginRespJSON = await loginResp.json();
+
+    if(typeof loginRespJSON === 'string') {
+      return alert(loginRespJSON)
+    }
     localStorage.setItem("accessToken", loginRespJSON.accessToken);
     reload();
   };

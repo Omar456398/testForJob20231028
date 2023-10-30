@@ -83,8 +83,8 @@
   padding: 20px 40px;
   box-shadow: -0px -10px 10px 10px black;
   position: fixed;
-  min-width: 767px;
-  width: calc(100% - 80px);
+  min-width: 687px;
+  width: calc(100vw - 80px);
   left: 0px;
   top: 0px;
   display: flex;

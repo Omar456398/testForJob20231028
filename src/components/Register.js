@@ -15,12 +15,12 @@ function Register() {
         email,
         password,
       }),
-    });
+    }).then((resp) => resp.json());
   };
 
-  const setValueByStateFunc = ({target: {value}}, stateFunc) => {
-    stateFunc(value)
-  }
+  const setValueByStateFunc = ({ target: { value } }, stateFunc) => {
+    stateFunc(value);
+  };
 
   useEffect(() => {
     try {
@@ -31,42 +31,70 @@ function Register() {
       if (decoded.exp * 1000 <= new Date().getTime()) {
         throw new Error("");
       }
-     history.replace('/')
-    } catch (_) {
-      
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+      history.replace("/");
+    } catch (_) {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <form>
       <table className="register-table">
         <tr>
-          <td colSpan={2} style={{textAlign: 'center'}}><h2>Register New User</h2></td>
+          <td colSpan={2} style={{ textAlign: "center" }}>
+            <h2>Register New User</h2>
+          </td>
         </tr>
         <tr>
           <td className="register-label">
             <label for="email">Email&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
           </td>
           <td>
-            <input type="email" className="register-input" required name="email" value={email} onChange={(e)=> setValueByStateFunc(e,setEmail)} />
+            <input
+              type="email"
+              className="register-input"
+              required
+              name="email"
+              value={email}
+              onChange={(e) => setValueByStateFunc(e, setEmail)}
+            />
           </td>
         </tr>
         <tr>
           <td className="register-label">
-            <label for="password">Password&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+            <label for="password">
+              Password&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </label>
           </td>
           <td>
-            <input className="register-input" type="password" required name="password" value={password} onChange={(e)=> setValueByStateFunc(e,setPassword)} />
+            <input
+              className="register-input"
+              type="password"
+              required
+              name="password"
+              value={password}
+              onChange={(e) => setValueByStateFunc(e, setPassword)}
+            />
           </td>
         </tr>
+        <tr></tr>
         <tr>
+          {" "}
+          <td colSpan={2} style={{ textAlign: "center" }}>
+            <input
+              className="create_user"
+              type="submit"
+              value="Create User"
+              onClick={(e) => {
+                e.preventDefault();
+                register().then((respJSON) => {
+                  if (typeof respJSON === "string") {
+                    return alert(respJSON);
+                  }
+                  history.replace("/");
+                });
+              }}
+            />
+          </td>
         </tr>
-        <tr> <td colSpan={2} style={{textAlign: 'center'}}>
-          <input className="create_user" type="submit" value="Create User" onClick={(e) => {
-            e.preventDefault()
-            register().then(history.replace('/'))
-          }} />
-        </td></tr>
       </table>
     </form>
   );
