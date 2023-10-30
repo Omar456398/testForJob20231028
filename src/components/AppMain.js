@@ -6,34 +6,40 @@ import { useHistory } from "react-router-dom";
 
 function AppMain() {
   const [tasks, setTasks] = useState([]);
-  const [userId, setUserId] = useState(0);
+  const [userData, setUserData] = useState({});
   const [accessToken, setAccessToken] = useState("");
   const [reloadToggle, setReloadToggle] = useState(false);
   const [newTask, setNewTask] = useState("");
+  const [isShowLogin, setIsShowLogin] = useState(false);
+  const [loginData, setLoginData] = useState({});
   const dragItem = useRef();
   const dragOverItem = useRef();
   const history = useHistory();
 
   useEffect(() => {
+    let continueLoading = true;
     try {
       if (!localStorage.getItem("accessToken")) {
         throw new Error("");
       }
       const decoded = jwtDecode(localStorage.getItem("accessToken"));
-      if (decoded.exp >= new Date().getTime) {
+      if (decoded.exp * 1000 <= new Date().getTime()) {
         throw new Error("");
       }
-      setUserId(decoded.sub);
+      setUserData(decoded);
       setAccessToken(localStorage.getItem("accessToken"));
+      setIsShowLogin(false);
     } catch (_) {
-      history.replace("/register");
-      return () => {};
+      setIsShowLogin(true);
+      continueLoading = false;
     }
-    if (accessToken) {
+    if (continueLoading) {
       (async () => {
         try {
           const resp = await fetch("http://localhost:3001/tasks", {
-            headers: { Authorization: `Bearer ${accessToken}` },
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
           });
           const respJSON = await resp.json();
           if (
@@ -48,7 +54,8 @@ function AppMain() {
       })();
     }
     return () => {};
-  }, [reloadToggle, history, accessToken]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reloadToggle]);
 
   const reload = () => {
     setReloadToggle((prev) => !prev);
@@ -63,11 +70,14 @@ function AppMain() {
       name: newTask,
       isCompleted: false,
       id: uuidv4(),
-      userId
+      userId: userData.sub,
     };
     fetch("http://localhost:3001/tasks", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
       body: JSON.stringify(dataToAdd),
     })
       .then(() => {
@@ -115,7 +125,10 @@ function AppMain() {
         newDragItemOrder += increment;
         fetch(`http://localhost:3001/tasks/${currentDragItem}`, {
           method: "PATCH",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
           body: JSON.stringify({ order: newDragItemOrder }),
         })
           .then(() => {
@@ -127,8 +140,105 @@ function AppMain() {
     dragOverItem.current = undefined;
     dragItem.current = undefined;
   };
-  return (
-    <>
+
+  const setLoginValue = ({ target: { name, value } }) => {
+    setLoginData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const login = async () => {
+    const loginResp = await fetch("http://localhost:3001/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(loginData),
+    });
+    const loginRespJSON = await loginResp.json();
+    localStorage.setItem("accessToken", loginRespJSON.accessToken);
+    reload();
+  };
+
+  return isShowLogin ? (
+    <form>
+      <table className="register-table">
+        <tr>
+          <td colSpan={3} style={{ textAlign: "center" }}>
+            <h2>Register New User</h2>
+          </td>
+        </tr>
+        <tr>
+          <td className="register-label">
+            <label for="email">Email&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+          </td>
+          <td colSpan={2}>
+            <input
+              type="email"
+              className="register-input"
+              required
+              name="email"
+              value={loginData.email || ""}
+              onChange={setLoginValue}
+            />
+          </td>
+        </tr>
+        <tr>
+          <td className="register-label">
+            <label for="password">
+              Password&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </label>
+          </td>
+          <td colSpan={2}>
+            <input
+              className="register-input"
+              type="password"
+              required
+              name="password"
+              value={loginData.password || ""}
+              onChange={setLoginValue}
+            />
+          </td>
+        </tr>
+        <tr></tr>
+        <tr>
+          <td></td>
+          <td style={{ textAlign: "center" }}>
+            <input
+              className="create_user"
+              type="submit"
+              value="Login"
+              onClick={(e) => {
+                e.preventDefault();
+                login();
+              }}
+            />
+          </td>
+          <td style={{ textAlign: "center" }}>
+            <button
+              className="create_user"
+              onClick={(e) => {
+                history.replace("/register");
+              }}
+            >
+              Register as New User
+            </button>
+          </td>
+        </tr>
+      </table>
+    </form>
+  ) : (
+    <div className="main_app">
+    <div className="logged_in_placeholder"></div>
+      <div className="logged_in">
+        {" "}
+        logged in as: {userData.email}{" "}
+        <button
+          onClick={() => {
+            localStorage.removeItem("accessToken");
+            reload();
+          }}
+          className="log_out"
+        >
+          Log out
+        </button>{" "}
+      </div>
       <form>
         <div className="add_task_container">
           <div className="flex1">
@@ -168,7 +278,7 @@ function AppMain() {
           />
         );
       })}
-    </>
+    </div>
   );
 }
 

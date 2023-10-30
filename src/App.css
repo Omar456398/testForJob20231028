@@ -4,7 +4,7 @@
   padding: 20px;
   border-radius: 10px;
   border-width: 2px 2px 1px 1px;
-  border-color: #ddd #ddd #bbb #bbb;
+  border-color: #ddd hsl(0, 0%, 87%) #bbb #bbb;
   border-style: solid;
 }
 .flex1 {
@@ -17,7 +17,7 @@
   cursor: pointer;
   user-select: none;
 }
-.dragger{
+.dragger {
   margin-right: 20px;
   font-size: 16px;
   cursor: move;
@@ -26,14 +26,33 @@
 .dragged-over {
   border-color: aquamarine;
 }
-.add_task_container{
+.add_task_container {
   display: flex;
   margin: 20px 40px;
 }
 .add_task_input,
-.edit_task_input{
+.edit_task_input,
+.register-input {
   width: calc(100% - 20px);
   height: 90%;
+  min-height: 30px;
+  border-radius: 10px;
+}
+.register-label {
+  white-space: nowrap;
+  width: 1px;
+}
+.register-table {
+  width: calc(100% - 80px);
+  margin: 20px 40px;
+  border-radius: 15px;
+  border-width: 2px 2px 1px 1px;
+  border-color: #ddd hsl(0, 0%, 87%) #bbb #bbb;
+  border-style: solid;
+  padding: 20px;
+}
+.register-table tr {
+  height: 40px;
 }
 .task-name {
   position: relative;
@@ -48,14 +67,52 @@
   padding: 10px;
   opacity: 0.5;
   border-radius: 6px;
-  content: 'double click, input text, and then press enter to edit';
+  content: "double click, input text, and then press enter to edit";
 }
 
-.add_task {
+.add_task,
+.create_user {
   padding: 10px;
   background-color: lightblue;
   border-radius: 10px;
   border-width: 2px 2px 1px 1px;
   border-color: #ddd #ddd #bbb #bbb;
   cursor: pointer;
+}
+.logged_in {
+  padding: 20px 40px;
+  box-shadow: -0px -10px 10px 10px black;
+  position: fixed;
+  min-width: 767px;
+  width: calc(100% - 80px);
+  left: 0px;
+  top: 0px;
+}
+.logged_in_placeholder {
+  height: 60px;
+}
+.main_app {
+  min-width: 767px;
+}
+.log_out {
+  margin-top: -10px;
+  padding: 10px;
+  background-color: lightcoral;
+  border-radius: 10px;
+  border-width: 2px 2px 1px 1px;
+  border-color: #ddd #ddd #bbb #bbb;
+  cursor: pointer;
+  float: right;
+}
+
+@media screen and (max-width: 766px) {
+  .register-table td {
+    display: block;
+    text-align: center;
+  }
+
+  .register-label {
+    font-weight: 700;
+    width: 100%;
+  }
 }
