@@ -44,6 +44,7 @@ function AppMain() {
         setUserData(decoded);
         setAccessToken(localStorage.getItem("accessToken"));
       } catch (_) {
+        localStorage.removeItem("accessToken")
         history.replace("/login");
         continueLoading = false;
       }
