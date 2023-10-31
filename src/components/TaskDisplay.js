@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { makeAlert } from "./Alert";
 
 function TaskDisplay({
   id,
@@ -9,16 +10,29 @@ function TaskDisplay({
   dragOver,
   refDraggedOver,
   drop,
-  accessToken
+  accessToken,
+  className,
 }) {
   const [isDragHover, setIsDragHover] = useState(false);
   const [nameEdited, setNameEdited] = useState(name);
   const [isNameBeingEdited, setIsNameBeingEdited] = useState(false);
+  const refClickCountReset = useRef(0);
+  const [clickCount, setClickCount] = useState(0);
+
+  useEffect(() => {
+    if (clickCount === 2) {
+      setNameEdited(name);
+      setIsNameBeingEdited(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clickCount]);
+
   return (
     <div
       className={
-        "task-container " +
-        (refDraggedOver.current === id ? "dragged-over" : "")
+        "task-container" +
+        (refDraggedOver.current === id ? " dragged-over" : "") +
+        (className ? ` ${className}` : "")
       }
       draggable={isDragHover}
       onDragStart={(e) => dragStart(e, id)}
@@ -50,24 +64,33 @@ function TaskDisplay({
                 setIsNameBeingEdited(false);
                 fetch(`http://localhost:3001/tasks/${id}`, {
                   method: "PATCH",
-                  headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${accessToken}`,
+                  },
                   body: JSON.stringify({ name: nameEdited.trim() }),
-                }).then((item) => {
-                  reload();
-                }).catch(()=>alert('failed to update'));
+                })
+                  .then((item) => {
+                    reload();
+                  })
+                  .catch(() => makeAlert("failed to update"));
               }
             }}
           />
         </div>
       ) : (
         <div
-          className="flex1 pointer"
-          onDoubleClick={() => {
-            setNameEdited(name);
-            setIsNameBeingEdited(true);
+          className="flex1 pointer ellipsis_container task-name-container"
+          onClick={() => {
+            setClickCount((prev) => prev + 1);
+            clearTimeout(refClickCountReset.current);
+            refClickCountReset.current = setTimeout(
+              () => setClickCount(0),
+              300
+            );
           }}
         >
-          <div className="task-name">{name || ""}</div>
+          <div className="task-name ellipsis_text">{name || ""}</div>
         </div>
       )}
       <div
@@ -75,11 +98,16 @@ function TaskDisplay({
         onClick={() => {
           fetch(`http://localhost:3001/tasks/${id}`, {
             method: "PATCH",
-            headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
             body: JSON.stringify({ isCompleted: !isCompleted }),
-          }).then((item) => {
-            reload();
-          }).catch(()=>alert('failed to update'));
+          })
+            .then((item) => {
+              reload();
+            })
+            .catch(() => makeAlert("failed to update"));
         }}
       >
         {isCompleted ? "✅" : "▶️"}
@@ -90,10 +118,15 @@ function TaskDisplay({
         onClick={() => {
           fetch(`http://localhost:3001/tasks/${id}`, {
             method: "DELETE",
-            headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
-          }).then((item) => {
-            reload();
-          }).catch(()=>alert('failed to delete'));
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+          })
+            .then((item) => {
+              reload();
+            })
+            .catch(() => makeAlert("failed to delete"));
         }}
       >
         ❌

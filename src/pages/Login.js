@@ -1,27 +1,16 @@
-import { jwtDecode } from "jwt-decode";
 import { useEffect, useState } from "react";
+import { jwtDecode } from "jwt-decode";
 import { useHistory } from "react-router-dom";
+import { makeAlert } from "../components/Alert";
 
-function Register() {
+function Login() {
+  const [loginData, setLoginData] = useState({});
+  const [isLoading, setIsLoading] = useState("");
   const history = useHistory();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
-  const register = () => {
-    return fetch("http://localhost:3001/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
-    }).then((resp) => resp.json());
+  const setLoginValue = ({ target: { name, value } }) => {
+    setLoginData((prev) => ({ ...prev, [name]: value }));
   };
-
-  const setValueByStateFunc = ({ target: { value } }, stateFunc) => {
-    stateFunc(value);
-  };
-
   useEffect(() => {
     try {
       if (!localStorage.getItem("accessToken")) {
@@ -35,12 +24,35 @@ function Register() {
     } catch (_) {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const login = async () => {
+    try {
+      setIsLoading(true);
+      const loginResp = await fetch("http://localhost:3001/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(loginData),
+      });
+      const loginRespJSON = await loginResp.json();
+
+      setIsLoading(false);
+      if (typeof loginRespJSON === "string") {
+        return makeAlert(loginRespJSON);
+      }
+      localStorage.setItem("accessToken", loginRespJSON.accessToken);
+      history.replace("/");
+    } catch (_) {
+      setIsLoading(false);
+      makeAlert("Failed to Login!");
+    }
+  };
+
   return (
     <form>
       <table className="register-table">
         <tr>
           <td colSpan={3} style={{ textAlign: "center" }}>
-            <h2>Register New User</h2>
+            <h2>Enter your Credentials</h2>
           </td>
         </tr>
         <tr>
@@ -53,8 +65,8 @@ function Register() {
               className="register-input"
               required
               name="email"
-              value={email}
-              onChange={(e) => setValueByStateFunc(e, setEmail)}
+              value={loginData.email || ""}
+              onChange={setLoginValue}
             />
           </td>
         </tr>
@@ -70,8 +82,8 @@ function Register() {
               type="password"
               required
               name="password"
-              value={password}
-              onChange={(e) => setValueByStateFunc(e, setPassword)}
+              value={loginData.password || ""}
+              onChange={setLoginValue}
             />
           </td>
         </tr>
@@ -79,29 +91,33 @@ function Register() {
         <tr>
           <td></td>
           <td style={{ textAlign: "center" }}>
-            <input
-              className="create_user"
-              type="submit"
-              value="Create User"
-              onClick={(e) => {
-                e.preventDefault();
-                register().then((respJSON) => {
-                  if (typeof respJSON === "string") {
-                    return alert(respJSON);
-                  }
-                  history.replace("/");
-                });
-              }}
-            />
+            {isLoading ? (
+              <button className="create_user" disabled>
+                &nbsp;&nbsp;
+                <span class="loader-small"></span>
+                &nbsp;&nbsp;
+              </button>
+            ) : (
+              <input
+                className="create_user"
+                type="submit"
+                value="Login"
+                onClick={(e) => {
+                  e.preventDefault();
+                  login();
+                }}
+              />
+            )}
           </td>
           <td style={{ textAlign: "center" }}>
             <button
+              disabled={isLoading}
               className="create_user"
               onClick={(e) => {
-                history.replace("/");
+                history.replace("/register");
               }}
             >
-              Login as Existing User
+              Register as New User
             </button>
           </td>
         </tr>
@@ -110,4 +126,4 @@ function Register() {
   );
 }
 
-export default Register;
+export default Login;
